@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Guess the Clinker Colour</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #fff7ec;
+    text-align: center;
+    padding: 30px;
+  }
+
+  .scoreboard {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+
+  .stage {
+    position: relative;
+    width: 420px;
+    height: 240px;
+    margin: 0 auto 20px;
+    overflow: hidden;
+  }
+
+  /* Clinker */
+  .clinker {
+    position: absolute;
+    right: 40px;
+    bottom: 0;
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle at top left, #6b3e1e, #3b1c0c);
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  .centre {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    top: 50px;
+    left: 50px;
+    display: none;
+  }
+
+  .bite {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    background: #fff7ec;
+    border-radius: 50%;
+    top: 20px;
+    right: -20px;
+    display: none;
+  }
+
+  /* Pac-Man style mouth */
+  .pacman {
+    position: absolute;
+    left: -120px;
+    bottom: 40px;
+    width: 100px;
+    height: 100px;
+    background: #ffd400;
+    border-radius: 50%;
+    clip-path: polygon(
+      0% 0%,
+      100% 50%,
+      0% 100%
+    );
+    transform-origin: center;
+    display: none;
+  }
+
+  .pacman.open {
+    clip-path: polygon(
+      0% 0%,
+      100% 50%,
+      0% 100%
+    );
+  }
+
+  .pacman.closed {
+    clip-path: circle(50% at 50% 50%);
+  }
+
+  button {
+    padding: 10px 18px;
+    margin: 6px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  #result {
+    font-size: 22px;
+    margin-top: 15px;
+    min-height: 30px;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>Guess the Clinker Colour!</h1>
+
+<div class="scoreboard">
+  Score: <span id="score">0</span> |
+  Streak: <span id="streak">0</span>
+</div>
+
+<div class="stage">
+
+  <div class="pacman open" id="pacman"></div>
+
+  <div class="clinker">
+    <div class="centre" id="centre"></div>
+    <div class="bite" id="bite"></div>
+  </div>
+
+</div>
+
+<div>
+  <button onclick="selectGuess('pink')">Pink</button>
+  <button onclick="selectGuess('yellow')">Yellow</button>
+  <button onclick="selectGuess('green')">Green</button>
+</div>
+
+<button onclick="reveal()">Reveal</button>
+
+<div id="result"></div>
+
+<audio id="crunchSound">
+  <source src="https://actions.google.com/sounds/v1/food/crunch.ogg" type="audio/ogg">
+</audio>
+
+<script>
+  const colours = ['pink', 'yellow', 'green'];
+  let correctColour = '';
+  let userGuess = null;
+  let revealed = false;
+  let score = 0;
+  let streak = 0;
+  let chompInterval = null;
+
+  function newRound() {
+    correctColour = colours[Math.floor(Math.random() * colours.length)];
+    userGuess = null;
+    revealed = false;
+
+    document.getElementById('centre').style.display = 'none';
+    document.getElementById('bite').style.display = 'none';
+    document.getElementById('pacman').style.display = 'none';
+    document.getElementById('pacman').style.left = '-120px';
+    document.getElementById('result').textContent = '';
+  }
+
+  function selectGuess(colour) {
+    if (revealed) return;
+    userGuess = colour;
+    document.getElementById('result').textContent =
+      `You chose ${colour.toUpperCase()}`;
+  }
+
+  function reveal() {
+    if (revealed || !userGuess) return;
+    revealed = true;
+
+    const pacman = document.getElementById('pacman');
+    const centre = document.getElementById('centre');
+    const bite = document.getElementById('bite');
+    const crunch = document.getElementById('crunchSound');
+
+    pacman.style.display = 'block';
+    pacman.className = 'pacman open';
+
+    // Start chomping animation
+    chompInterval = setInterval(() => {
+      pacman.classList.toggle('open');
+      pacman.classList.toggle('closed');
+    }, 120);
+
+    // Move toward clinker
+    let pos = -120;
+    const move = setInterval(() => {
+      pos += 8;
+      pacman.style.left = pos + 'px';
+
+      if (pos >= 230) {
+        clearInterval(move);
+        clearInterval(chompInterval);
+
+        pacman.className = 'pacman closed';
+        crunch.currentTime = 0;
+        crunch.play();
+
+        bite.style.display = 'block';
+
+        setTimeout(() => {
+          centre.style.backgroundColor = correctColour;
+          centre.style.display = 'block';
+        }, 100);
+
+        setTimeout(updateScore, 250);
+
+        setTimeout(() => {
+          pacman.style.display = 'none';
+        }, 500);
+      }
+    }, 30);
+  }
+
+  function updateScore() {
+    if (userGuess === correctColour) {
+      score++;
+      streak++;
+      document.getElementById('result').textContent = '😄 Correct!';
+    } else {
+      streak = 0;
+      document.getElementById('result').textContent =
+        `😬 Wrong! It was ${correctColour.toUpperCase()}`;
+    }
+    document.getElementById('score').textContent = score;
+    document.getElementById('streak').textContent = streak;
+
+    setTimeout(newRound, 2500);
+  }
+
+  newRound();
+</script>
+
+</body>
+</html>
