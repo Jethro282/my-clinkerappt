@@ -59,7 +59,7 @@
     display: none;
   }
 
-  /* Pac-Man style mouth */
+  /* REAL Pac-Man */
   .pacman {
     position: absolute;
     left: -120px;
@@ -68,25 +68,43 @@
     height: 100px;
     background: #ffd400;
     border-radius: 50%;
-    clip-path: polygon(
-      0% 0%,
-      100% 50%,
-      0% 100%
-    );
-    transform-origin: center;
     display: none;
+    z-index: 10;
   }
 
-  .pacman.open {
-    clip-path: polygon(
-      0% 0%,
-      100% 50%,
-      0% 100%
-    );
+  .pacman::before,
+  .pacman::after {
+    content: "";
+    position: absolute;
+    width: 100px;
+    height: 50px;
+    background: #ffd400;
+    left: 0;
   }
 
-  .pacman.closed {
-    clip-path: circle(50% at 50% 50%);
+  .pacman::before {
+    top: 0;
+    border-radius: 100px 100px 0 0;
+    transform-origin: bottom center;
+  }
+
+  .pacman::after {
+    bottom: 0;
+    border-radius: 0 0 100px 100px;
+    transform-origin: top center;
+  }
+
+  .pacman.open::before {
+    transform: rotate(-35deg);
+  }
+
+  .pacman.open::after {
+    transform: rotate(35deg);
+  }
+
+  .pacman.closed::before,
+  .pacman.closed::after {
+    transform: rotate(0deg);
   }
 
   button {
@@ -135,103 +153,4 @@
 <div id="result"></div>
 
 <audio id="crunchSound">
-  <source src="https://actions.google.com/sounds/v1/food/crunch.ogg" type="audio/ogg">
-</audio>
-
-<script>
-  const colours = ['pink', 'yellow', 'green'];
-  let correctColour = '';
-  let userGuess = null;
-  let revealed = false;
-  let score = 0;
-  let streak = 0;
-  let chompInterval = null;
-
-  function newRound() {
-    correctColour = colours[Math.floor(Math.random() * colours.length)];
-    userGuess = null;
-    revealed = false;
-
-    document.getElementById('centre').style.display = 'none';
-    document.getElementById('bite').style.display = 'none';
-    document.getElementById('pacman').style.display = 'none';
-    document.getElementById('pacman').style.left = '-120px';
-    document.getElementById('result').textContent = '';
-  }
-
-  function selectGuess(colour) {
-    if (revealed) return;
-    userGuess = colour;
-    document.getElementById('result').textContent =
-      `You chose ${colour.toUpperCase()}`;
-  }
-
-  function reveal() {
-    if (revealed || !userGuess) return;
-    revealed = true;
-
-    const pacman = document.getElementById('pacman');
-    const centre = document.getElementById('centre');
-    const bite = document.getElementById('bite');
-    const crunch = document.getElementById('crunchSound');
-
-    pacman.style.display = 'block';
-    pacman.className = 'pacman open';
-
-    // Start chomping animation
-    chompInterval = setInterval(() => {
-      pacman.classList.toggle('open');
-      pacman.classList.toggle('closed');
-    }, 120);
-
-    // Move toward clinker
-    let pos = -120;
-    const move = setInterval(() => {
-      pos += 8;
-      pacman.style.left = pos + 'px';
-
-      if (pos >= 230) {
-        clearInterval(move);
-        clearInterval(chompInterval);
-
-        pacman.className = 'pacman closed';
-        crunch.currentTime = 0;
-        crunch.play();
-
-        bite.style.display = 'block';
-
-        setTimeout(() => {
-          centre.style.backgroundColor = correctColour;
-          centre.style.display = 'block';
-        }, 100);
-
-        setTimeout(updateScore, 250);
-
-        setTimeout(() => {
-          pacman.style.display = 'none';
-        }, 500);
-      }
-    }, 30);
-  }
-
-  function updateScore() {
-    if (userGuess === correctColour) {
-      score++;
-      streak++;
-      document.getElementById('result').textContent = '😄 Correct!';
-    } else {
-      streak = 0;
-      document.getElementById('result').textContent =
-        `😬 Wrong! It was ${correctColour.toUpperCase()}`;
-    }
-    document.getElementById('score').textContent = score;
-    document.getElementById('streak').textContent = streak;
-
-    setTimeout(newRound, 2500);
-  }
-
-  newRound();
-</script>
-
-</body>
-</html>
+  <source sr
