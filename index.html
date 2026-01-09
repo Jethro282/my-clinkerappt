@@ -59,7 +59,7 @@ body {
   display: none;
 }
 
-/* Pac-Man mouth */
+/* Pac-Man (real wedge mouth) */
 .pacman {
   position: absolute;
   left: -120px;
@@ -68,36 +68,18 @@ body {
   height: 100px;
   background: #ffd400;
   border-radius: 50%;
+  clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
   display: none;
   z-index: 10;
 }
 
-.pacman::before,
-.pacman::after {
-  content: "";
-  position: absolute;
-  width: 100px;
-  height: 50px;
-  background: #ffd400;
-  left: 0;
+.pacman.open {
+  clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
 }
 
-.pacman::before {
-  top: 0;
-  border-radius: 100px 100px 0 0;
-  transform-origin: bottom center;
+.pacman.closed {
+  clip-path: circle(50% at 50% 50%);
 }
-
-.pacman::after {
-  bottom: 0;
-  border-radius: 0 0 100px 100px;
-  transform-origin: top center;
-}
-
-.pacman.open::before { transform: rotate(-35deg); }
-.pacman.open::after { transform: rotate(35deg); }
-.pacman.closed::before,
-.pacman.closed::after { transform: rotate(0deg); }
 
 button {
   padding: 10px 18px;
@@ -133,12 +115,13 @@ button {
 </div>
 
 <div>
-  <button onclick="selectGuess('pink')">Pink</button>
-  <button onclick="selectGuess('yellow')">Yellow</button>
-  <button onclick="selectGuess('green')">Green</button>
+  <button onclick="selectGuess('pink')">🩷 Pink</button>
+  <button onclick="selectGuess('yellow')">💛 Yellow</button>
+  <button onclick="selectGuess('green')">💚 Green</button>
 </div>
 
 <button onclick="reveal()">Reveal</button>
+<button onclick="resetGame()">Reset Clinker</button>
 
 <div id="result"></div>
 
@@ -148,14 +131,17 @@ button {
 
 <script>
 const colours = ["pink", "yellow", "green"];
-let actual = colours[Math.floor(Math.random() * colours.length)];
-let guess = null;
-let score = 0;
-let streak = 0;
+const emoji = { pink: "🩷", yellow: "💛", green: "💚" };
+
+let actual, guess = null;
+let score = 0, streak = 0;
+
+resetGame();
 
 function selectGuess(c) {
   guess = c;
-  document.getElementById("result").textContent = "Guess locked in!";
+  document.getElementById("result").textContent =
+    `${emoji[c]} ${c.charAt(0).toUpperCase() + c.slice(1)} selected`;
 }
 
 function reveal() {
@@ -196,14 +182,29 @@ function bite() {
   if (guess === actual) {
     score++;
     streak++;
-    result.textContent = "Correct!";
+    result.textContent = "🎉 Correct! 🥳";
   } else {
     streak = 0;
-    result.textContent = "Wrong! It was " + actual;
+    result.textContent = `❌ Wrong! It was ${emoji[actual]} ${actual}`;
   }
 
   document.getElementById("score").textContent = score;
   document.getElementById("streak").textContent = streak;
+
+  setTimeout(() => {
+    document.getElementById("pacman").style.display = "none";
+  }, 300);
+}
+
+function resetGame() {
+  actual = colours[Math.floor(Math.random() * colours.length)];
+  guess = null;
+
+  document.getElementById("centre").style.display = "none";
+  document.getElementById("bite").style.display = "none";
+  document.getElementById("pacman").style.display = "none";
+  document.getElementById("pacman").style.left = "-120px";
+  document.getElementById("result").textContent = "";
 }
 </script>
 
