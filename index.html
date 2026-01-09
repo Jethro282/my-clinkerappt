@@ -6,119 +6,111 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #fff7ec;
-    text-align: center;
-    padding: 30px;
-  }
+body {
+  font-family: Arial, sans-serif;
+  background: #fff7ec;
+  text-align: center;
+  padding: 30px;
+}
 
-  .scoreboard {
-    font-size: 18px;
-    margin-bottom: 15px;
-  }
+.scoreboard {
+  font-size: 18px;
+  margin-bottom: 15px;
+}
 
-  .stage {
-    position: relative;
-    width: 420px;
-    height: 240px;
-    margin: 0 auto 20px;
-    overflow: hidden;
-  }
+.stage {
+  position: relative;
+  width: 420px;
+  height: 240px;
+  margin: 0 auto 20px;
+  overflow: hidden;
+}
 
-  /* Clinker */
-  .clinker {
-    position: absolute;
-    right: 40px;
-    bottom: 0;
-    width: 180px;
-    height: 180px;
-    background: radial-gradient(circle at top left, #6b3e1e, #3b1c0c);
-    border-radius: 50%;
-    overflow: hidden;
-  }
+/* Clinker */
+.clinker {
+  position: absolute;
+  right: 40px;
+  bottom: 0;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle at top left, #6b3e1e, #3b1c0c);
+  border-radius: 50%;
+  overflow: hidden;
+}
 
-  .centre {
-    position: absolute;
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    top: 50px;
-    left: 50px;
-    display: none;
-  }
+.centre {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  top: 50px;
+  left: 50px;
+  display: none;
+}
 
-  .bite {
-    position: absolute;
-    width: 70px;
-    height: 70px;
-    background: #fff7ec;
-    border-radius: 50%;
-    top: 20px;
-    right: -20px;
-    display: none;
-  }
+.bite {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  background: #fff7ec;
+  border-radius: 50%;
+  top: 40px;
+  right: -20px;
+  display: none;
+}
 
-  /* REAL Pac-Man */
-  .pacman {
-    position: absolute;
-    left: -120px;
-    bottom: 40px;
-    width: 100px;
-    height: 100px;
-    background: #ffd400;
-    border-radius: 50%;
-    display: none;
-    z-index: 10;
-  }
+/* Pac-Man mouth */
+.pacman {
+  position: absolute;
+  left: -120px;
+  bottom: 40px;
+  width: 100px;
+  height: 100px;
+  background: #ffd400;
+  border-radius: 50%;
+  display: none;
+  z-index: 10;
+}
 
-  .pacman::before,
-  .pacman::after {
-    content: "";
-    position: absolute;
-    width: 100px;
-    height: 50px;
-    background: #ffd400;
-    left: 0;
-  }
+.pacman::before,
+.pacman::after {
+  content: "";
+  position: absolute;
+  width: 100px;
+  height: 50px;
+  background: #ffd400;
+  left: 0;
+}
 
-  .pacman::before {
-    top: 0;
-    border-radius: 100px 100px 0 0;
-    transform-origin: bottom center;
-  }
+.pacman::before {
+  top: 0;
+  border-radius: 100px 100px 0 0;
+  transform-origin: bottom center;
+}
 
-  .pacman::after {
-    bottom: 0;
-    border-radius: 0 0 100px 100px;
-    transform-origin: top center;
-  }
+.pacman::after {
+  bottom: 0;
+  border-radius: 0 0 100px 100px;
+  transform-origin: top center;
+}
 
-  .pacman.open::before {
-    transform: rotate(-35deg);
-  }
+.pacman.open::before { transform: rotate(-35deg); }
+.pacman.open::after { transform: rotate(35deg); }
+.pacman.closed::before,
+.pacman.closed::after { transform: rotate(0deg); }
 
-  .pacman.open::after {
-    transform: rotate(35deg);
-  }
+button {
+  padding: 10px 18px;
+  margin: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
 
-  .pacman.closed::before,
-  .pacman.closed::after {
-    transform: rotate(0deg);
-  }
-
-  button {
-    padding: 10px 18px;
-    margin: 6px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-
-  #result {
-    font-size: 22px;
-    margin-top: 15px;
-    min-height: 30px;
-  }
+#result {
+  font-size: 22px;
+  margin-top: 15px;
+  min-height: 30px;
+}
 </style>
 </head>
 
@@ -132,14 +124,12 @@
 </div>
 
 <div class="stage">
-
   <div class="pacman open" id="pacman"></div>
 
   <div class="clinker">
     <div class="centre" id="centre"></div>
     <div class="bite" id="bite"></div>
   </div>
-
 </div>
 
 <div>
@@ -153,4 +143,69 @@
 <div id="result"></div>
 
 <audio id="crunchSound">
-  <source sr
+  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_42b8b36e6d.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const colours = ["pink", "yellow", "green"];
+let actual = colours[Math.floor(Math.random() * colours.length)];
+let guess = null;
+let score = 0;
+let streak = 0;
+
+function selectGuess(c) {
+  guess = c;
+  document.getElementById("result").textContent = "Guess locked in!";
+}
+
+function reveal() {
+  if (!guess) {
+    alert("Pick a colour first!");
+    return;
+  }
+
+  const pacman = document.getElementById("pacman");
+  pacman.style.display = "block";
+
+  let x = -120;
+  let open = true;
+
+  const move = setInterval(() => {
+    x += 6;
+    pacman.style.left = x + "px";
+    pacman.className = "pacman " + (open ? "open" : "closed");
+    open = !open;
+
+    if (x >= 220) {
+      clearInterval(move);
+      bite();
+    }
+  }, 80);
+}
+
+function bite() {
+  document.getElementById("crunchSound").play();
+  document.getElementById("bite").style.display = "block";
+
+  const centre = document.getElementById("centre");
+  centre.style.background = actual;
+  centre.style.display = "block";
+
+  const result = document.getElementById("result");
+
+  if (guess === actual) {
+    score++;
+    streak++;
+    result.textContent = "Correct!";
+  } else {
+    streak = 0;
+    result.textContent = "Wrong! It was " + actual;
+  }
+
+  document.getElementById("score").textContent = score;
+  document.getElementById("streak").textContent = streak;
+}
+</script>
+
+</body>
+</html>
