@@ -26,11 +26,11 @@ body {
   overflow: hidden;
 }
 
-/* Clinker */
+/* ===== CLINKER ===== */
 .clinker {
   position: absolute;
   right: 40px;
-  bottom: 0;
+  top: 30px;               /* FIXED POSITION */
   width: 180px;
   height: 180px;
   background: radial-gradient(circle at top left, #6b3e1e, #3b1c0c);
@@ -59,11 +59,11 @@ body {
   display: none;
 }
 
-/* Mouth container */
+/* ===== MOUTH ===== */
 .mouth {
   position: absolute;
   left: -140px;
-  bottom: 60px;
+  top: 90px;
   width: 120px;
   height: 80px;
   display: none;
@@ -79,26 +79,28 @@ body {
   overflow: hidden;
 }
 
-.top {
+.jaw.top {
   top: 0;
   border-radius: 60px 60px 0 0;
   transform-origin: bottom center;
 }
 
-.bottom {
+.jaw.bottom {
   bottom: 0;
   border-radius: 0 0 60px 60px;
   transform-origin: top center;
 }
 
-/* Teeth */
+/* Teeth container */
 .teeth {
+  position: absolute;
+  right: 10px;
+  top: 6px;
   display: flex;
-  justify-content: flex-end;
   gap: 6px;
-  padding: 6px 12px;
 }
 
+/* Individual tooth */
 .tooth {
   width: 0;
   height: 0;
@@ -106,25 +108,25 @@ body {
   border-right: 6px solid transparent;
 }
 
-.top .tooth {
-  border-top: 10px solid white;
+.jaw.top .tooth {
+  border-top: 10px solid #fff;
 }
 
-.bottom .tooth {
-  border-bottom: 10px solid white;
+.jaw.bottom .tooth {
+  border-bottom: 10px solid #fff;
 }
 
-/* Open / close states */
-.open .top {
+/* Mouth animation */
+.open .jaw.top {
   transform: rotate(-25deg);
 }
 
-.open .bottom {
+.open .jaw.bottom {
   transform: rotate(25deg);
 }
 
-.closed .top,
-.closed .bottom {
+.closed .jaw.top,
+.closed .jaw.bottom {
   transform: rotate(0deg);
 }
 
@@ -154,6 +156,7 @@ button {
 
 <div class="stage">
 
+  <!-- MOUTH -->
   <div class="mouth open" id="mouth">
     <div class="jaw top">
       <div class="teeth">
@@ -169,6 +172,7 @@ button {
     </div>
   </div>
 
+  <!-- CLINKER -->
   <div class="clinker">
     <div class="centre" id="centre"></div>
     <div class="bite" id="bite"></div>
