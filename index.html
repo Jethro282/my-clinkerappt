@@ -38,19 +38,6 @@ body {
   overflow: hidden;
 }
 
-.clinker.wiggle {
-  animation: wiggle 0.6s ease-in-out;
-}
-
-@keyframes wiggle {
-  0%   { transform: rotate(0deg); }
-  20%  { transform: rotate(-5deg); }
-  40%  { transform: rotate(5deg); }
-  60%  { transform: rotate(-5deg); }
-  80%  { transform: rotate(5deg); }
-  100% { transform: rotate(0deg); }
-}
-
 .centre {
   position: absolute;
   width: 80px;
@@ -81,14 +68,17 @@ body {
   height: 100px;
   background: #ffd400;
   border-radius: 50%;
-  clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
   display: none;
   z-index: 10;
-  transform: rotate(180deg);
 }
 
+/* Mouth animation */
 .pacman.open {
-  clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+  clip-path: polygon(
+    50% 50%,
+    100% 0%,
+    100% 100%
+  );
 }
 
 .pacman.closed {
@@ -122,16 +112,16 @@ button {
 <div class="stage">
   <div class="pacman open" id="pacman"></div>
 
-  <div class="clinker" id="clinker">
+  <div class="clinker">
     <div class="centre" id="centre"></div>
     <div class="bite" id="bite"></div>
   </div>
 </div>
 
 <div>
-  <button onclick="selectGuess('pink')">🩷 Pink</button>
-  <button onclick="selectGuess('yellow')">💛 Yellow</button>
-  <button onclick="selectGuess('green')">💚 Green</button>
+  <button onclick="selectGuess('pink')">Pink</button>
+  <button onclick="selectGuess('yellow')">Yellow</button>
+  <button onclick="selectGuess('green')">Green</button>
 </div>
 
 <button onclick="reveal()">Reveal</button>
@@ -152,12 +142,6 @@ const colourMap = {
   green: "#4cd964"
 };
 
-const emoji = {
-  pink: "🩷",
-  yellow: "💛",
-  green: "💚"
-};
-
 let actual, guess = null;
 let score = 0, streak = 0;
 
@@ -166,7 +150,7 @@ resetGame();
 function selectGuess(c) {
   guess = c;
   document.getElementById("result").textContent =
-    `${emoji[c]} ${c.charAt(0).toUpperCase() + c.slice(1)} selected`;
+    c.charAt(0).toUpperCase() + c.slice(1) + " selected";
 }
 
 function reveal() {
@@ -174,14 +158,7 @@ function reveal() {
     alert("Pick a colour first!");
     return;
   }
-
-  const clinker = document.getElementById("clinker");
-  clinker.classList.add("wiggle");
-
-  setTimeout(() => {
-    clinker.classList.remove("wiggle");
-    startPacman();
-  }, 650);
+  startPacman();
 }
 
 function startPacman() {
@@ -192,7 +169,7 @@ function startPacman() {
   let open = true;
 
   const move = setInterval(() => {
-    x += 5;
+    x += 6;
     pacman.style.left = x + "px";
     pacman.className = "pacman " + (open ? "open" : "closed");
     open = !open;
@@ -201,7 +178,7 @@ function startPacman() {
       clearInterval(move);
       bite();
     }
-  }, 140);
+  }, 160); // slower, smoother chomping
 }
 
 function bite() {
@@ -217,10 +194,10 @@ function bite() {
   if (guess === actual) {
     score++;
     streak++;
-    result.textContent = "🎉 Correct! 🥳";
+    result.textContent = "Correct! 🎉";
   } else {
     streak = 0;
-    result.textContent = `❌ Wrong! It was ${emoji[actual]} ${actual}`;
+    result.textContent = "Wrong! It was " + actual;
   }
 
   document.getElementById("score").textContent = score;
