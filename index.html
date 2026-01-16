@@ -94,8 +94,9 @@ body {
 /* Teeth */
 .teeth {
   display: flex;
-  justify-content: space-around;
-  padding: 4px 6px;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 6px 12px;
 }
 
 .tooth {
@@ -156,12 +157,14 @@ button {
   <div class="mouth open" id="mouth">
     <div class="jaw top">
       <div class="teeth">
-        <div class="tooth"></div><div class="tooth"></div>
+        <div class="tooth"></div>
+        <div class="tooth"></div>
       </div>
     </div>
     <div class="jaw bottom">
       <div class="teeth">
-        </div><div class="tooth"></div><div class="tooth"></div>
+        <div class="tooth"></div>
+        <div class="tooth"></div>
       </div>
     </div>
   </div>
@@ -276,4 +279,3 @@ function resetGame() {
 
 </body>
 </html>
-
