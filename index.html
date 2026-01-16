@@ -38,6 +38,19 @@ body {
   overflow: hidden;
 }
 
+.clinker.wiggle {
+  animation: wiggle 0.6s ease-in-out;
+}
+
+@keyframes wiggle {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(-5deg); }
+  40%  { transform: rotate(5deg); }
+  60%  { transform: rotate(-5deg); }
+  80%  { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
+}
+
 .centre {
   position: absolute;
   width: 80px;
@@ -59,7 +72,7 @@ body {
   display: none;
 }
 
-/* Pac-Man (real wedge mouth) */
+/* Pac-Man */
 .pacman {
   position: absolute;
   left: -120px;
@@ -71,6 +84,7 @@ body {
   clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
   display: none;
   z-index: 10;
+  transform: rotate(180deg);
 }
 
 .pacman.open {
@@ -108,7 +122,7 @@ button {
 <div class="stage">
   <div class="pacman open" id="pacman"></div>
 
-  <div class="clinker">
+  <div class="clinker" id="clinker">
     <div class="centre" id="centre"></div>
     <div class="bite" id="bite"></div>
   </div>
@@ -131,7 +145,18 @@ button {
 
 <script>
 const colours = ["pink", "yellow", "green"];
-const emoji = { pink: "🩷", yellow: "💛", green: "💚" };
+
+const colourMap = {
+  pink: "#ff5fa2",
+  yellow: "#ffd84d",
+  green: "#4cd964"
+};
+
+const emoji = {
+  pink: "🩷",
+  yellow: "💛",
+  green: "💚"
+};
 
 let actual, guess = null;
 let score = 0, streak = 0;
@@ -150,6 +175,16 @@ function reveal() {
     return;
   }
 
+  const clinker = document.getElementById("clinker");
+  clinker.classList.add("wiggle");
+
+  setTimeout(() => {
+    clinker.classList.remove("wiggle");
+    startPacman();
+  }, 650);
+}
+
+function startPacman() {
   const pacman = document.getElementById("pacman");
   pacman.style.display = "block";
 
@@ -157,7 +192,7 @@ function reveal() {
   let open = true;
 
   const move = setInterval(() => {
-    x += 6;
+    x += 5;
     pacman.style.left = x + "px";
     pacman.className = "pacman " + (open ? "open" : "closed");
     open = !open;
@@ -166,7 +201,7 @@ function reveal() {
       clearInterval(move);
       bite();
     }
-  }, 80);
+  }, 140);
 }
 
 function bite() {
@@ -174,7 +209,7 @@ function bite() {
   document.getElementById("bite").style.display = "block";
 
   const centre = document.getElementById("centre");
-  centre.style.background = actual;
+  centre.style.background = colourMap[actual];
   centre.style.display = "block";
 
   const result = document.getElementById("result");
