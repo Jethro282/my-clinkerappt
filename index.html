@@ -59,30 +59,72 @@ body {
   display: none;
 }
 
-/* Pac-Man */
-.pacman {
+/* Mouth container */
+.mouth {
   position: absolute;
-  left: -120px;
-  bottom: 40px;
-  width: 100px;
-  height: 100px;
-  background: #ffd400;
-  border-radius: 50%;
+  left: -140px;
+  bottom: 60px;
+  width: 120px;
+  height: 80px;
   display: none;
   z-index: 10;
 }
 
-/* Mouth animation */
-.pacman.open {
-  clip-path: polygon(
-    50% 50%,
-    100% 0%,
-    100% 100%
-  );
+/* Jaws */
+.jaw {
+  position: absolute;
+  width: 120px;
+  height: 40px;
+  background: #d32f2f;
+  overflow: hidden;
 }
 
-.pacman.closed {
-  clip-path: circle(50% at 50% 50%);
+.top {
+  top: 0;
+  border-radius: 60px 60px 0 0;
+  transform-origin: bottom center;
+}
+
+.bottom {
+  bottom: 0;
+  border-radius: 0 0 60px 60px;
+  transform-origin: top center;
+}
+
+/* Teeth */
+.teeth {
+  display: flex;
+  justify-content: space-around;
+  padding: 4px 6px;
+}
+
+.tooth {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+}
+
+.top .tooth {
+  border-top: 10px solid white;
+}
+
+.bottom .tooth {
+  border-bottom: 10px solid white;
+}
+
+/* Open / close states */
+.open .top {
+  transform: rotate(-25deg);
+}
+
+.open .bottom {
+  transform: rotate(25deg);
+}
+
+.closed .top,
+.closed .bottom {
+  transform: rotate(0deg);
 }
 
 button {
@@ -110,12 +152,25 @@ button {
 </div>
 
 <div class="stage">
-  <div class="pacman open" id="pacman"></div>
+
+  <div class="mouth open" id="mouth">
+    <div class="jaw top">
+      <div class="teeth">
+        <div class="tooth"></div><div class="tooth"></div><div class="tooth"></div>
+      </div>
+    </div>
+    <div class="jaw bottom">
+      <div class="teeth">
+        <div class="tooth"></div><div class="tooth"></div><div class="tooth"></div>
+      </div>
+    </div>
+  </div>
 
   <div class="clinker">
     <div class="centre" id="centre"></div>
     <div class="bite" id="bite"></div>
   </div>
+
 </div>
 
 <div>
@@ -135,7 +190,6 @@ button {
 
 <script>
 const colours = ["pink", "yellow", "green"];
-
 const colourMap = {
   pink: "#ff5fa2",
   yellow: "#ffd84d",
@@ -158,27 +212,27 @@ function reveal() {
     alert("Pick a colour first!");
     return;
   }
-  startPacman();
+  startMouth();
 }
 
-function startPacman() {
-  const pacman = document.getElementById("pacman");
-  pacman.style.display = "block";
+function startMouth() {
+  const mouth = document.getElementById("mouth");
+  mouth.style.display = "block";
 
-  let x = -120;
+  let x = -140;
   let open = true;
 
   const move = setInterval(() => {
     x += 6;
-    pacman.style.left = x + "px";
-    pacman.className = "pacman " + (open ? "open" : "closed");
+    mouth.style.left = x + "px";
+    mouth.className = "mouth " + (open ? "open" : "closed");
     open = !open;
 
     if (x >= 220) {
       clearInterval(move);
       bite();
     }
-  }, 160); // slower, smoother chomping
+  }, 170);
 }
 
 function bite() {
@@ -204,7 +258,7 @@ function bite() {
   document.getElementById("streak").textContent = streak;
 
   setTimeout(() => {
-    document.getElementById("pacman").style.display = "none";
+    document.getElementById("mouth").style.display = "none";
   }, 300);
 }
 
@@ -214,8 +268,8 @@ function resetGame() {
 
   document.getElementById("centre").style.display = "none";
   document.getElementById("bite").style.display = "none";
-  document.getElementById("pacman").style.display = "none";
-  document.getElementById("pacman").style.left = "-120px";
+  document.getElementById("mouth").style.display = "none";
+  document.getElementById("mouth").style.left = "-140px";
   document.getElementById("result").textContent = "";
 }
 </script>
