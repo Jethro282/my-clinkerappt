@@ -13,8 +13,6 @@
     padding: 30px;
   }
 
-  h1 { margin-bottom: 10px; }
-
   .scoreboard {
     font-size: 18px;
     margin-bottom: 15px;
@@ -28,7 +26,6 @@
     overflow: hidden;
   }
 
-  /* Clinker */
   .clinker {
     position: absolute;
     right: 60px;
@@ -61,7 +58,6 @@
     display: none;
   }
 
-  /* Mouth */
   .mouth {
     position: absolute;
     left: -140px;
@@ -87,7 +83,6 @@
     border-radius: 50%;
     border: 2px solid #000;
     overflow: hidden;
-    z-index: 20;
   }
 
   .pupil {
@@ -125,12 +120,10 @@
   }
 
   @keyframes chompTop {
-    from { transform: rotate(0deg); }
     to { transform: rotate(-10deg); }
   }
 
   @keyframes chompBottom {
-    from { transform: rotate(0deg); }
     to { transform: rotate(10deg); }
   }
 
@@ -139,27 +132,16 @@
     width: 18px;
     height: 22px;
     background: #fff;
-    border-radius: 0 0 4px 4px;
   }
 
-  .top-jaw .tooth {
-    bottom: 0;
-  }
-
-  .bottom-jaw .tooth {
-    top: 0;
-    transform: rotate(180deg);
-  }
+  .top-jaw .tooth { bottom: 0; }
+  .bottom-jaw .tooth { top: 0; transform: rotate(180deg); }
 
   .top-jaw .tooth:nth-child(1),
-  .bottom-jaw .tooth:nth-child(1) {
-    right: 20px;
-  }
+  .bottom-jaw .tooth:nth-child(1) { right: 20px; }
 
   .top-jaw .tooth:nth-child(2),
-  .bottom-jaw .tooth:nth-child(2) {
-    right: 48px;
-  }
+  .bottom-jaw .tooth:nth-child(2) { right: 48px; }
 
   button {
     padding: 10px 18px;
@@ -221,10 +203,6 @@
 
 <div id="result"></div>
 
-<audio id="crunch">
-  <source src="https://actions.google.com/sounds/v1/foley/crunch.ogg">
-</audio>
-
 <script>
   const colours = {
     pink: '#ff69b4',
@@ -232,17 +210,12 @@
     green: '#4caf50'
   };
 
-  let answer = null;
-  let guess = null;
-  let revealed = false;
-  let score = 0;
-  let streak = 0;
+  let answer, guess, revealed = false, score = 0, streak = 0;
 
   function resetClinker() {
     answer = Object.keys(colours)[Math.floor(Math.random() * 3)];
     guess = null;
     revealed = false;
-
     document.getElementById('centre').style.display = 'none';
     document.getElementById('bite').style.display = 'none';
     document.getElementById('mouth').style.display = 'none';
@@ -254,7 +227,7 @@
   function selectGuess(colour) {
     if (revealed) {
       document.getElementById('result').textContent =
-        'Please select Reset Clinker, then choose a colour, then Reveal.';
+        'Please reset before guessing again.';
       return;
     }
     guess = colour;
@@ -262,35 +235,21 @@
   }
 
   function reveal() {
-    if (revealed) {
-      document.getElementById('result').textContent =
-        'Please select Reset Clinker, then choose a colour, then Reveal.';
-      return;
-    }
-
-    if (!guess) {
-      document.getElementById('result').textContent =
-        'Please select a colour first.';
-      return;
-    }
+    if (revealed || !guess) return;
 
     revealed = true;
-
     const mouth = document.getElementById('mouth');
     mouth.style.display = 'block';
 
     setTimeout(() => {
-      document.getElementById('crunch').play();
       document.getElementById('bite').style.display = 'block';
       const centre = document.getElementById('centre');
       centre.style.background = colours[answer];
       centre.style.display = 'block';
-
       mouth.style.display = 'none';
 
       if (guess === answer) {
-        score++;
-        streak++;
+        score++; streak++;
         document.getElementById('result').textContent = '🎉 Correct!';
       } else {
         streak = 0;
@@ -300,12 +259,9 @@
 
       document.getElementById('score').textContent = score;
       document.getElementById('streak').textContent = streak;
-
-    }, 1200);
+    }, 2600); // 👈 THIS is the critical line
   }
 </script>
 
 </body>
 </html>
-
-
